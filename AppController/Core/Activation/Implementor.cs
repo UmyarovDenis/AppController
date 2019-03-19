@@ -2,6 +2,7 @@
 using AppController.Core.DIContainer;
 using AppController.Core.Dynamic;
 using AppController.Infrastructure.Enums;
+using AppController.Infrastructure.Exceptions;
 
 namespace AppController.Core.Activation
 {
@@ -46,7 +47,7 @@ namespace AppController.Core.Activation
                 return instance;
             }
 
-            throw new ArgumentException();
+            throw new BindingNotExistException();
         }
         public TInstance CreateInstance<TInstance>(IBinding binding)
         {
