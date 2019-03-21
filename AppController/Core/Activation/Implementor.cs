@@ -51,7 +51,7 @@ namespace AppController.Core.Activation
         {
             object instance = null;
 
-            if (binding.InstanceScopeType == InstanceScopeType.Singleton && binding.Instance != null)
+            if (binding.Instance != null)
             {
                 return binding.Instance;
             }
