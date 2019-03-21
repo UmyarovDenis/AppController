@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AppController.Core.Dynamic
+﻿namespace AppController.Core.Dynamic
 {
     public class BindableBase : IBindableBase
     {
@@ -16,11 +14,12 @@ namespace AppController.Core.Dynamic
         }
         public IComponent Rebind<T>()
         {
-            throw new NotImplementedException();
+            Unbind<T>();
+            return new Component(_bindingRepository, typeof(T));
         }
-        public IComponent Unbind<T>()
+        public void Unbind<T>()
         {
-            throw new NotImplementedException();
+            _bindingRepository.RemoveBinding<T>();
         }
     }
 }

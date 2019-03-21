@@ -8,9 +8,9 @@ namespace AppController.Tests.Mocks
 {
     class Human : IUnit
     {
-        IWeapon weapon;
-        IMessageService message;
-        int age;
+        private IWeapon weapon;
+        private IMessageService message;
+        private int age;
 
         public Human(IWeapon weapon, IMessageService message, int age = 64)
         {

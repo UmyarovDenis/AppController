@@ -1,6 +1,5 @@
 ﻿using AppController.Core.Dynamic;
 using AppController.Core.Modules;
-using AppController.Infrastructure.Enums;
 using AppController.Tests.Mocks;
 
 namespace AppController.Tests.Modules
@@ -13,9 +12,11 @@ namespace AppController.Tests.Modules
         }
         public override void Load()
         {
-            Bind<IWeapon>().To<Sword>();
+            Bind<IWeapon>().To<Pistol>();
             Bind<IMessageService>().To<MessageService>();
             Bind<IUnit>().To<Human>();
+            Bind<IWeaponComponent>().To<Muffler>();
+            Bind<TestClass>().ToInstance(new TestClass());
         }
     }
 }

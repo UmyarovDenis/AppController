@@ -50,15 +50,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mocks\Human.cs" />
+    <Compile Include="Mocks\InjectedClass.cs" />
+    <Compile Include="Mocks\IWeaponComponent.cs" />
     <Compile Include="Mocks\IMessageService.cs" />
     <Compile Include="Mocks\IUnit.cs" />
     <Compile Include="Mocks\IWeapon.cs" />
     <Compile Include="Mocks\MessageService.cs" />
+    <Compile Include="Mocks\Muffler.cs" />
     <Compile Include="Mocks\Pistol.cs" />
     <Compile Include="Mocks\Sword.cs" />
     <Compile Include="Mocks\TestClass.cs" />
     <Compile Include="Modules\ServiceModule.cs" />
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="InstanceExplorerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BindingRepositoryTests.cs" />
     <Compile Include="ContainerTests.cs" />

@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Linq;
 using System.Collections.Generic;
+using AppController.Infrastructure.Attributes;
 
 namespace AppController.Core.Activation
 {
@@ -34,6 +35,13 @@ namespace AppController.Core.Activation
             foreach (var parameter in GetParameters(constructor))
                 if (!parameter.IsOptional)
                     yield return parameter;
+        }
+        public static bool TryGetInjectedFields(object instance, out List<FieldInfo> fields)
+        {
+            var fieldInfos = instance.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+            fields = fieldInfos.Where(f => Attribute.IsDefined(f, typeof(InjectedAttribute))).ToList();
+
+            return fields.Count() > 0;
         }
     }
 }

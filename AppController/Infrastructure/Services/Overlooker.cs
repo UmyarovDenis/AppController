@@ -2,7 +2,6 @@
 using AppController.Infrastructure.Exceptions;
 using System;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace AppController.Infrastructure.Services
 {
@@ -11,7 +10,7 @@ namespace AppController.Infrastructure.Services
         public static void CheckExistenceBinding<TBinding>(IBindingRepository bindingRepository)
         {
             if (bindingRepository.GetBinding<TBinding>() == null)
-                throw new BindingNotExistException($"{typeof(TBinding).Name} not founded in current module");
+                throw new BindingNotExistException($"{typeof(TBinding).Name} not founded in current module. Module: {bindingRepository.GetType().Name}");
         }
         public static void CheckViewModelBinding<TView, TViewModel>(IBindingRepository bindingRepository)
             where TView : FrameworkElement where TViewModel : class

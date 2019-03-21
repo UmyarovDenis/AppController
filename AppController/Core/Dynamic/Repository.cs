@@ -19,6 +19,20 @@ namespace AppController.Core.Dynamic
                 _bindings.Add(binding.BindingType, binding);
             }
         }
+        public void RemoveBinding(IBinding binding)
+        {
+            if (_bindings.ContainsKey(binding.BindingType))
+            {
+                _bindings.Remove(binding.BindingType);
+            }
+        }
+        public void RemoveBinding<TBinding>()
+        {
+            if (_bindings.ContainsKey(typeof(TBinding)))
+            {
+                _bindings.Remove(typeof(TBinding));
+            }
+        }
         public IBinding GetBinding<TBinding>()
         {
             if (_bindings.ContainsKey(typeof(TBinding)))

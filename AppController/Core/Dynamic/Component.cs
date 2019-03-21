@@ -19,12 +19,10 @@ namespace AppController.Core.Dynamic
 
             return new Configuration<TImplementation>(_repository);
         }
-        public virtual IConfiguration<TInstance> ToInstance<TInstance>(TInstance instance)
+        public virtual void ToInstance(object instance)
         {
             IBinding binding = new Binding(_bindingType, instance);
             _repository.AddBinding(binding);
-
-            return new Configuration<TInstance>(_repository);
         }
     }
 }

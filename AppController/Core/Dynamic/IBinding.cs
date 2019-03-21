@@ -11,5 +11,7 @@ namespace AppController.Core.Dynamic
         InstanceScopeType InstanceScopeType { get; set; }
         object[] BindingConstructorArguments { get; set; }
         object[] ServiceConstructorArguments { get; set; }
+        object[] BindingAdditionalArguments { get; set; }
+        object[] ServiceAdditionalArguments { get; set; }
     }
 }

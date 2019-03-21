@@ -2,7 +2,6 @@
 using AppController.Core.DIContainer;
 using AppController.Core.Dynamic;
 using AppController.Infrastructure.Enums;
-using AppController.Infrastructure.Exceptions;
 
 namespace AppController.Core.Activation
 {
@@ -22,64 +21,78 @@ namespace AppController.Core.Activation
 
             if (binding != null)
             {
-                if (binding.InstanceScopeType == InstanceScopeType.Singleton && binding.Instance != null)
-                {
-                    return binding.Instance;
-                }
-
-                if (binding?.ServiceConstructorArguments != null)
-                    return Activator.CreateInstance(instanceType, binding.ServiceConstructorArguments);
-
-                object instance = null;
-
-                if(InstanceExplorer.HasDefaultConstructor(binding.ServiceType))
-                {
-                    instance = Activator.CreateInstance(binding.ServiceType);
-                }
-                else
-                {
-                    instance = Inject(binding.ServiceType);
-                }
-                
-                if (binding.InstanceScopeType == InstanceScopeType.Singleton)
-                    binding.Instance = instance;
-
-                return instance;
+                return CreateInstance(binding);
+            }
+            else if (instanceType.IsClass)
+            {
+                return Activate(instanceType);
             }
 
-            throw new BindingNotExistException();
-        }
-        public TInstance CreateInstance<TInstance>(IBinding binding)
-        {
-            throw new NotImplementedException();
+            throw new ArgumentException();
         }
         public object CreateInstance(Type instanceType, params object[] args)
         {
-            object instance = null;
-
             if (args?.Length > 0)
             {
-                instance = Activator.CreateInstance(instanceType, args);
-            }
-            if (HasDefaultConstructor(instanceType))
-            {
-                instance = Activator.CreateInstance(instanceType);
+                return Activator.CreateInstance(instanceType, args);
             }
 
-            return Inject(instanceType);
+            return CreateInstance(instanceType);
         }
         public TInstance CreateInstance<TInstance>(Type instanceType, params object[] args)
         {
             return (TInstance)CreateInstance(instanceType, args);
         }
-        private bool HasDefaultConstructor(Type instanceType)
+        public TInstance CreateInstance<TInstance>(IBinding binding)
         {
-            var constructors = instanceType.GetConstructors();
+            return (TInstance)CreateInstance(binding);
+        }
+        public object CreateInstance(IBinding binding)
+        {
+            object instance = null;
 
-            if (constructors.Length > 1)
-                return false;
+            if (binding.InstanceScopeType == InstanceScopeType.Singleton && binding.Instance != null)
+            {
+                return binding.Instance;
+            }
 
-            return true;
+            if (binding?.ServiceConstructorArguments != null)
+                return Activator.CreateInstance(binding.ServiceType, binding.ServiceConstructorArguments);
+
+            instance = Activate(binding.ServiceType);
+
+            if (binding.InstanceScopeType == InstanceScopeType.Singleton)
+                binding.Instance = instance;
+
+            return instance;
+        }
+        public object CreateInstance(Type instanceType, object[] args, object[] additionalArgs)
+        {
+            if (args?.Length > 0 && additionalArgs?.Length > 0)
+            {
+                object[] arguments = new object[args.Length + additionalArgs.Length];
+                args.CopyTo(arguments, 0);
+                additionalArgs.CopyTo(arguments, args.Length);
+
+                return Activator.CreateInstance(instanceType, arguments);
+            }
+
+            return Inject(instanceType, additionalArgs);
+        }
+        public TInstance CreateInstance<TInstance>(Type instanceType, object[] args, object[] additionalArgs)
+        {
+            return (TInstance)CreateInstance(instanceType, args, additionalArgs);
+        }
+        public object Activate(Type instanceType)
+        {
+            if (InstanceExplorer.HasDefaultConstructor(instanceType))
+            {
+                return Activator.CreateInstance(instanceType);
+            }
+            else
+            {
+                return Inject(instanceType);
+            }
         }
     }
 }

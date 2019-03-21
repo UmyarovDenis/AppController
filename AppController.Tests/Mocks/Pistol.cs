@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AppController.Tests.Mocks
+﻿namespace AppController.Tests.Mocks
 {
     class Pistol : IWeapon
     {
-        public Pistol(string name)
+        public Pistol(IWeaponComponent component, string name = "Desert Eagle")
         {
-            Name = name;
+            Name = $"{name} with {component.Name}";
         }
         public string Name { get; set; }
     }

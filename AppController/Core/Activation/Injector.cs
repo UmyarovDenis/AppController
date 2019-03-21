@@ -1,5 +1,7 @@
 ﻿using AppController.Core.DIContainer;
 using AppController.Core.Dynamic;
+using AppController.Core.Modules;
+using AppController.Infrastructure.Attributes;
 using AppController.Infrastructure.Extensions;
 using System;
 using System.Collections.Generic;
@@ -17,7 +19,7 @@ namespace AppController.Core.Activation
         {
             _container = container;
         }
-        public object Inject(Type instanceType)
+        public object Inject(Type instanceType, object[] additionalArgs = null)
         {
             var constructors = InstanceExplorer.GetOrderedConstructorList(instanceType);
 
@@ -27,14 +29,21 @@ namespace AppController.Core.Activation
                 var parameterTypes = parameters.Select(p => p.ParameterType);
                 var bindings = _container.Mudule.Bindings.SearchBindings(parameterTypes);
 
-                if(parameterTypes.Count() == bindings.Count())
+                object[] arguments = null;
+
+                if(additionalArgs != null && parameterTypes.Count() == (bindings.Count() + additionalArgs.Length))
                 {
-                    var @params = GetParametersImplementations(bindings).ToArray();
-                    return Activator.CreateInstance(instanceType, BindingFlags.CreateInstance |
-                                                                  BindingFlags.Public |
-                                                                  BindingFlags.Instance |
-                                                                  BindingFlags.OptionalParamBinding, null, @params,
-                                                                  CultureInfo.CurrentCulture);
+                    arguments = GetParametersImplementations(bindings).Concat(additionalArgs).ToArray();
+                    object instance = Create(instanceType, arguments);
+
+                    return instance;
+                }
+                else if(parameterTypes.Count() == bindings?.Count())
+                {
+                    arguments = GetParametersImplementations(bindings).ToArray();
+                    object instance = Create(instanceType, arguments);
+
+                    return instance;
                 }
             }
 
@@ -43,6 +52,17 @@ namespace AppController.Core.Activation
         public TInstance Inject<TInstance>(Type instanceType)
         {
             return (TInstance)Inject(instanceType);
+        }
+        public void InjectValues(object instance, IEnumerable<FieldInfo> injectedFields)
+        {
+            foreach(var field in injectedFields)
+            {
+                if (field.FieldType.IsEquivalentTo(typeof(IControllerCore)))
+                {
+                    IModule module = Activator.CreateInstance(field.GetCustomAttribute<InjectedAttribute>().ModuleType) as IModule;
+                    field.SetValue(instance, new ControllerCore(module, _container));
+                }
+            }
         }
         private List<object> GetParametersImplementations(IEnumerable<IBinding> bindings)
         {
@@ -54,6 +74,19 @@ namespace AppController.Core.Activation
             }
 
             return parameters;
+        }
+        private object Create(Type instanceType, object[] args)
+        {
+            object instance =  Activator.CreateInstance(instanceType, BindingFlags.CreateInstance |
+                BindingFlags.Public | BindingFlags.Instance | BindingFlags.OptionalParamBinding, null, args,
+                CultureInfo.CurrentCulture);
+
+            if (InstanceExplorer.TryGetInjectedFields(instance, out List<FieldInfo> injectedFields))
+            {
+                InjectValues(instance, injectedFields);
+            }
+
+            return instance;
         }
     }
 }

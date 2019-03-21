@@ -1,5 +1,6 @@
 ﻿using AppController.Core.Dynamic;
 using AppController.Core.Modules;
+using AppController.Infrastructure.Enums;
 using AppController.Infrastructure.Services;
 using System;
 using System.Collections.Generic;
@@ -74,14 +75,15 @@ namespace AppController.Core.Activation
 
             return CreateView<TView>(GetBinding<TView>()) as Window;
         }
-        public Window GetWindow<TView, TViewModel>(IEnumerable<Action<TView>> viewActions, IEnumerable<Action<TViewModel>> viewModelActions)
-            where TView : FrameworkElement
-            where TViewModel : class
+        public Window GetWindow<TView, TViewModel>(IEnumerable<Action<TView>> viewActions, IEnumerable<Action<TViewModel>> viewModelActions,
+            object[] additionalViewArgs, object[] additionalViewModelArgs) where TView : FrameworkElement where TViewModel : class
         {
             if (!typeof(TView).BaseType.IsEquivalentTo(typeof(Window)))
                 throw new ArgumentException($"{typeof(TView).Name} is not a Window");
 
             IBinding binding = GetBinding<TView>();
+            binding.BindingAdditionalArguments = additionalViewArgs;
+            binding.ServiceAdditionalArguments = additionalViewModelArgs;
 
             Overlooker.CheckViewModelBinding<TView, TViewModel>(_viewModelsBindings);
 
@@ -102,8 +104,23 @@ namespace AppController.Core.Activation
         }
         private Tuple<TView, object> GetContext<TView>(IBinding binding)
         {
-            TView view = _implementor.CreateInstance<TView>(binding.BindingType, binding.BindingConstructorArguments);
-            object viewModel = _implementor.CreateInstance(binding.ServiceType, binding.ServiceConstructorArguments);
+            object viewModel = null;
+
+            TView view = _implementor.CreateInstance<TView>(binding.BindingType, binding.BindingConstructorArguments,
+                binding.BindingAdditionalArguments);
+
+            if (binding.InstanceScopeType == InstanceScopeType.Singleton && binding.Instance != null)
+            {
+                viewModel = binding.Instance;
+            }
+            else
+            {
+                viewModel = _implementor.CreateInstance(binding.ServiceType, binding.ServiceConstructorArguments,
+                    binding.ServiceAdditionalArguments);
+                
+                if(binding.InstanceScopeType == InstanceScopeType.Singleton)
+                    binding.Instance = viewModel;
+            }
 
             return new Tuple<TView, object>(view, viewModel);
         }

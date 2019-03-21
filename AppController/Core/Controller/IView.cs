@@ -6,7 +6,7 @@ namespace AppController.Core.Controller
     public interface IView<TView, TViewModel> where TView : FrameworkElement where TViewModel : class
     {
         void Run();
-        void RunDialog();
+        bool? RunDialog();
         TResult RunDialogWithResult<TResult>(Func<TViewModel, TResult> executor);
     }
 }

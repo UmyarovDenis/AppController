@@ -17,10 +17,7 @@ namespace AppController.Infrastructure.Extensions
                     bindings.Add(binding);
             }
 
-            if (bindings.Count > 0)
-                return bindings;
-
-            return null;
+            return bindings;
         }
     }
 }

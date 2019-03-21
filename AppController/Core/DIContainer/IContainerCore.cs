@@ -1,9 +1,10 @@
-﻿using AppController.Core.Modules;
+﻿using AppController.Core.Dynamic;
+using AppController.Core.Modules;
 using System;
 
 namespace AppController.Core.DIContainer
 {
-    public interface IContainerCore
+    public interface IContainerCore : IBindableBase
     {
         IModule Mudule { get; set; }
         TImplementation ResolveInterface<TImplementation>();

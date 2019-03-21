@@ -8,7 +8,8 @@ namespace AppController.Core.Activation
     {
         Window GetWindow<TView>() 
             where TView : FrameworkElement;
-        Window GetWindow<TView, TViewModel>(IEnumerable<Action<TView>> viewActions, IEnumerable<Action<TViewModel>> viewModelActions)
+        Window GetWindow<TView, TViewModel>(IEnumerable<Action<TView>> viewActions, IEnumerable<Action<TViewModel>> viewModelActions, 
+            object[] additionalViewArgs, object[] additionalViewModelArgs)
             where TView : FrameworkElement where TViewModel : class;
         TView GetView<TView>() 
             where TView : FrameworkElement;

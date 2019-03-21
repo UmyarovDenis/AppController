@@ -20,7 +20,7 @@ namespace AppController.Tests.Mocks
         {
 
         }
-        public TestClass(IWeapon weapon, int x, string str)
+        public TestClass(IWeapon weapon, int x = 1, string str = "simple string")
         {
 
         }

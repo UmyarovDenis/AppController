@@ -3,6 +3,6 @@
     public interface IComponent
     {
         IConfiguration<TImplementation> To<TImplementation>();
-        IConfiguration<TInstance> ToInstance<TInstance>(TInstance instance);
+        void ToInstance(object instance);
     }
 }

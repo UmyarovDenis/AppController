@@ -3,7 +3,7 @@
     public interface IBindableBase
     {
         IComponent Bind<T>();
-        IComponent Unbind<T>();
+        void Unbind<T>();
         IComponent Rebind<T>();
     }
 }

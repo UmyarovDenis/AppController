@@ -11,6 +11,26 @@ namespace AppController.Core.Controller
         public ControllerConfigurator(IViewFactory viewFactory) : base(viewFactory)
         { }
 
+        public IControllerConfigurator<TView, TViewModel> AdditionalViewModelParams(params object[] args)
+        {
+            if(args?.Length > 0)
+            {
+                _additionalViewModelArgs = args;
+            }
+
+            return this;
+        }
+
+        public IControllerConfigurator<TView, TViewModel> AdditionalViewParams(params object[] args)
+        {
+            if (args?.Length > 0)
+            {
+                _additionalViewArgs = args;
+            }
+
+            return this;
+        }
+
         public IControllerConfigurator<TView, TViewModel> View(Action<TView> action)
         {
             if (action == null)

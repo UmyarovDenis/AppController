@@ -11,6 +11,9 @@ namespace AppController.Core.Controller
         protected readonly List<Action<TView>> _viewActions;
         protected readonly List<Action<TViewModel>> _viewModelActions;
 
+        protected object[] _additionalViewArgs;
+        protected object[] _additionalViewModelArgs;
+
         private readonly IViewFactory _viewFactory;
 
         public ViewResolver(IViewFactory viewFactory)
@@ -24,7 +27,7 @@ namespace AppController.Core.Controller
         {
             try
             {
-                Window window = _viewFactory.GetWindow<TView, TViewModel>(_viewActions, _viewModelActions);
+                Window window = _viewFactory.GetWindow(_viewActions, _viewModelActions, _additionalViewArgs, _additionalViewModelArgs);
 
                 window.Show();
             }
@@ -33,13 +36,13 @@ namespace AppController.Core.Controller
                 throw;
             }
         }
-        public void RunDialog()
+        public bool? RunDialog()
         {
             try
             {
-                Window window = _viewFactory.GetWindow<TView, TViewModel>(_viewActions, _viewModelActions);
+                Window window = _viewFactory.GetWindow(_viewActions, _viewModelActions, _additionalViewArgs, _additionalViewModelArgs);
 
-                window.ShowDialog();
+                return window.ShowDialog();
             }
             catch (Exception)
             {
@@ -50,7 +53,7 @@ namespace AppController.Core.Controller
         {
             try
             {
-                Window window = _viewFactory.GetWindow<TView, TViewModel>(_viewActions, _viewModelActions);
+                Window window = _viewFactory.GetWindow(_viewActions, _viewModelActions, _additionalViewArgs, _additionalViewModelArgs);
 
                 if (window.ShowDialog() == true)
                 {
