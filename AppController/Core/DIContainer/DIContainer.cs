@@ -15,6 +15,7 @@ namespace AppController.Core.DIContainer
             _module = module;
             _module.Load();
             _implementor = new Implementor(this);
+            Bind<IContainerCore>().ToInstance(this);
         }
         public IModule Mudule
         {

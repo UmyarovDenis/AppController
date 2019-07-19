@@ -50,12 +50,13 @@
     <Compile Include="Core\Activation\Injector.cs" />
     <Compile Include="Core\Activation\InstanceExplorer.cs" />
     <Compile Include="Core\Controller\ControllerConfigurator.cs" />
-    <Compile Include="Core\Controller\IController.cs" />
     <Compile Include="Core\Controller\IView.cs" />
     <Compile Include="Core\Controller\IControllerConfigurator.cs" />
     <Compile Include="Core\Controller\IViewRegister.cs" />
     <Compile Include="Core\Activation\IViewFactory.cs" />
-    <Compile Include="Core\Controller\Navigation\INavigator.cs" />
+    <Compile Include="Core\Controller\Navigation\IPageNavigator.cs" />
+    <Compile Include="Core\Controller\Navigation\PageAttribute.cs" />
+    <Compile Include="Core\Controller\Navigation\PageNavigator.cs" />
     <Compile Include="Core\Controller\ViewRegister.cs" />
     <Compile Include="Core\Controller\ViewResolver.cs" />
     <Compile Include="Core\Activation\ViewFactory.cs" />

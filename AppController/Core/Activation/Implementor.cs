@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using AppController.Core.DIContainer;
 using AppController.Core.Dynamic;
 using AppController.Infrastructure.Enums;
@@ -68,16 +69,14 @@ namespace AppController.Core.Activation
         }
         public object CreateInstance(Type instanceType, object[] args, object[] additionalArgs)
         {
-            if (args?.Length > 0 && additionalArgs?.Length > 0)
-            {
-                object[] arguments = new object[args.Length + additionalArgs.Length];
-                args.CopyTo(arguments, 0);
-                additionalArgs.CopyTo(arguments, args.Length);
+            List<object> arguments = new List<object>();
 
-                return Activator.CreateInstance(instanceType, arguments);
-            }
+            if (args != null)
+                arguments.AddRange(args);
+            if (additionalArgs != null)
+                arguments.AddRange(additionalArgs);
 
-            return Inject(instanceType, additionalArgs);
+            return Inject(instanceType, arguments.Count > 0 ? arguments.ToArray() : null);
         }
         public TInstance CreateInstance<TInstance>(Type instanceType, object[] args, object[] additionalArgs)
         {

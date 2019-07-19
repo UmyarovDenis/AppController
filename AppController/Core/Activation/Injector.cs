@@ -62,6 +62,11 @@ namespace AppController.Core.Activation
                     IModule module = Activator.CreateInstance(field.GetCustomAttribute<InjectedAttribute>().ModuleType) as IModule;
                     field.SetValue(instance, new ControllerCore(module, _container));
                 }
+                else if (field.FieldType.IsEquivalentTo(typeof(IContainerCore)))
+                {
+                    IModule module = Activator.CreateInstance(field.GetCustomAttribute<InjectedAttribute>().ModuleType) as IModule;
+                    field.SetValue(instance, new DIContainer.DIContainer(module));
+                }
             }
         }
         private List<object> GetParametersImplementations(IEnumerable<IBinding> bindings)

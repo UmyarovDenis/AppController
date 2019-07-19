@@ -1,8 +1,11 @@
-﻿using AppController.Core.Dynamic;
+﻿using AppController.Core.Controller.Navigation;
+using AppController.Core.Dynamic;
 using AppController.Core.Modules;
 using AppController.Infrastructure.Enums;
 using AppController.Infrastructure.Services;
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Windows;
 
@@ -102,6 +105,11 @@ namespace AppController.Core.Activation
             Overlooker.CheckExistenceBinding<TKey>(_viewModelsBindings);
             return _viewModelsBindings.GetBinding<TKey>();
         }
+        private IBinding GetBinding(Type keyType)
+        {
+            return _viewModelsBindings.GetBinding(keyType);
+        }
+        [Obsolete("Testing")]
         private Tuple<TView, object> GetContext<TView>(IBinding binding)
         {
             object viewModel = null;
@@ -117,6 +125,14 @@ namespace AppController.Core.Activation
             {
                 viewModel = _implementor.CreateInstance(binding.ServiceType, binding.ServiceConstructorArguments,
                     binding.ServiceAdditionalArguments);
+
+                Type viewModelType = viewModel.GetType();
+
+                if(Attribute.IsDefined(viewModelType, typeof(ControllerPageAttribute)))
+                {
+                    var pageBindings = viewModelType.GetCustomAttributes<ControllerPageAttribute>()
+                        .Select(x => GetBinding(x.PageType));
+                }
                 
                 if(binding.InstanceScopeType == InstanceScopeType.Singleton)
                     binding.Instance = viewModel;
@@ -124,11 +140,55 @@ namespace AppController.Core.Activation
 
             return new Tuple<TView, object>(view, viewModel);
         }
+        private Tuple<object, object>GetContext(IBinding binding)
+        {
+            object viewModel = null;
+
+            var view = _implementor.CreateInstance(binding.BindingType, binding.BindingConstructorArguments,
+                binding.BindingAdditionalArguments);
+
+            if (binding.InstanceScopeType == InstanceScopeType.Singleton && binding.Instance != null)
+            {
+                viewModel = binding.Instance;
+            }
+            else
+            {
+                viewModel = _implementor.CreateInstance(binding.ServiceType, binding.ServiceConstructorArguments,
+                    binding.ServiceAdditionalArguments);
+
+                Type viewModelType = viewModel.GetType();
+
+                if (Attribute.IsDefined(viewModelType, typeof(ControllerPageAttribute)))
+                {
+                    IEnumerable<FrameworkElement> pages = viewModelType.GetCustomAttributes<ControllerPageAttribute>()
+                        .Select(x => CreateView(GetBinding(x.PageType)))
+                        .Cast<FrameworkElement>();
+
+                    FieldInfo controllerInfo = viewModelType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
+                        .FirstOrDefault(f => f.FieldType.IsEquivalentTo(typeof(IControllerCore)));
+
+                    if (controllerInfo != null)
+                    {
+                        controllerInfo.FieldType.GetProperty("PageNavigator", BindingFlags.Public | BindingFlags.Instance)
+                            .SetValue(controllerInfo.GetValue(viewModel), new PageNavigator(pages));
+                    }
+                }
+
+                if (binding.InstanceScopeType == InstanceScopeType.Singleton)
+                    binding.Instance = viewModel;
+            }
+
+            return new Tuple<object, object>(view, viewModel);
+        }
         private TView CreateView<TView>(IBinding binding) where TView : FrameworkElement
         {
-            var tuple = GetContext<TView>(binding);
+            return CreateView(binding) as TView;
+        }
+        private object CreateView(IBinding binding)
+        {
+            var tuple = GetContext(binding);
 
-            TView view = tuple.Item1;
+            FrameworkElement view = (FrameworkElement)tuple.Item1;
             view.DataContext = tuple.Item2;
 
             return view;
